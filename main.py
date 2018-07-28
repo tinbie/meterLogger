@@ -1,3 +1,5 @@
+import matplotlib as mlp
+import matplotlib.pyplot as plt
 from meter import Meter
 
 meter = Meter()
@@ -10,9 +12,28 @@ def startScreen():
 def createNewMeter():
 	_name = input('Name your meter! ')
 	_count = input('... metercount? ')
-	meter.createTable(_name, _count)
+	meter.createMetertable(_name, _count)
 
-def defineExistingMeter():
+# Convert table[[a1,b1],[a2,b2]] to table[[a1,a2],[b1,b2]],
+# which is necessary to plot the metercounts.
+def plotMetercounts(_meterList):
+	_dateList = []
+	_countList = []
+
+	for date, count in _meterList:
+		_dateList.append(date)
+		_countList.append(count)
+
+	_dateList.pop(0)
+	_countList.pop(0)
+	plt.plot(_dateList, _countList)
+	plt.grid(True)
+	plt.show()
+
+def addMetercount(_meterName):
+	_collectingDate = input('Date: ')
+	_collectingCount = input('Count: ')
+	meter.setMetercount(_meterName, _collectingDate, _collectingCount)
 
 def main():
 	choose = "0"
@@ -22,20 +43,19 @@ def main():
 		createNewMeter()
 
 	elif choose == "2":
-		existingMeters = meter.checkForTables()
+		existingMeters = meter.getExistingMetertables()
 		print('Existing Meters are: ', *existingMeters, sep = '\n')
 		name = input('Data of which one? ')
-		print(meter.openTable(name))
-		
-		chooseToEdit = input('Editing? [y/n] ')
-		
-		if chooseToEdit == "y": 
-			collectingDate = input('Date: ')
-			collectingCount = input('Count: ')
-			meter.setCounter(name, collectingDate, collectingCount)
+		meterList = meter.openMetertable(name)
+		print(meterList)
+		plotMetercounts(meterList)
 
+	while True:
+		chooseToEdit = input('Adding new count? [y/n] ')
+		if chooseToEdit == "y":
+			addMetercount(name)			
 		else:
-			return()
+			break
 
 #*************************START************************
 
